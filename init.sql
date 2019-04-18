@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS Accounts;
+
+CREATE TABLE User
+(
+    userid INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
+);
+
+CREATE TABLE Account(
+    accountid INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_userid INTEGER NOT NULL,
+    balance REAL NOT NULL,
+    FOREIGN KEY(user_userid) REFERENCES User(userid) ON DELETE CASCADE
+);
