@@ -1,11 +1,13 @@
 {
   "name": "455Assignment2",
   "version": "1.0.0",
-  "description": "sudo apt-get install sqlite3 libsqlite3-dev",
+  "description": "node packes for project",
   "main": "app.js",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "express": "^4.16.4"
+    "client-sessions": "^0.8.0",
+    "express": "^4.16.4",
+    "sqlite3": "^4.0.6"
   },
   "devDependencies": {},
   "scripts": {
