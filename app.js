@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const session = require('client-sessions');
 const ac = require('./account-creation.js');
 const lv = require('./login-verification');
+const dbfuns = require('./db-functions.js');
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -12,29 +13,39 @@ const port = 3000;
 // From https://stormpath.com/blog/everything-you-ever-wanted-to-know-about-node-dot-js-sessions 
 app.use(session({
     cookieName: 'session',
-    secret: 'random_string_goes_here',
+    secret: 'how is it even possible to know that a randopm string is!?',
     duration: 180000,
     activeDuration: 180000,
+    // duration: 30000,
+    // activeDuration: 30000,
     httpOnly: true,
     secure: true,
     ephemeral: true
   }));
 
-  var sessionMiddleware = app.use(function(req, res, next) {
-    if (req.session && req.session.user) {
-      User.findOne({ email: req.session.user.email }, function(err, user) {
-        if (user) {
-          req.user = user;
-          req.session.user = user;  //refresh the session value
-          res.locals.user = user;
+app.use(function(req, res, next) {
+    if (req.session && req.session.username) {
+        async function a() {
+            let check = await dbfuns.getUser("select * from Users where username = ?", [req.session.username]);
+            if (req.session.username === check.username) {
+                req.session.user = check.username;  //refresh the session value
+                
+            };
         }
+        a();
         // finishing processing the middleware and run the route
         next();
-      });
     } else {
-      next();
+        next();
     }
   });
+
+function requireLogin (req, res) {
+    if (!req.session.username) {
+        req.session.reset();
+        res.redirect('/');
+    }
+  };
 
 app.get('/', function(req, res) {
     // TODO: Add XSS Defenses
@@ -66,13 +77,13 @@ app.post('/createaccount', function(req, res) {
 
 app.post('/login', function (req, res) {
 
-
     async function a() {
         let loginSuccess = true;
         loginSuccess = await lv.verifyLogin(req.body.username, req.body.password);
         if (loginSuccess === true) {
-            // TODO: setup session management
+            // Start session
             req.session.username = req.body.username;
+
             res.redirect('/account');
         }
         else {
@@ -84,35 +95,45 @@ app.post('/login', function (req, res) {
 });
 
 app.get('/account', function(req, res) {
-    res.send();
-    //res.sendFile(__dirname + "/html/account.html");
+    requireLogin(req, res);
+    //res.send(req.session.username);
+
+
+    res.sendFile(__dirname + "/html/account.html");
 });
 
 app.post('/account', function(req, res) {
+    requireLogin(req, res);
 
 });
 
 app.get('/withdraw', function(req, res) {
+    requireLogin(req, res);
 
 });
 
 app.post('/withdraw', function(req, res) {
+    requireLogin(req, res);
 
 });
 
 app.get('/deposit', function(req, res) {
+    requireLogin(req, res);
 
 });
 
 app.post('/deposit', function(req, res) {
+    requireLogin(req, res);
 
 });
 
 app.get('/transfer', function(req, res) {
+    requireLogin(req, res);
 
 });
 
 app.post('/transfer', function(req, res) {
+    requireLogin(req, res);
 
 });
 

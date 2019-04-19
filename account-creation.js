@@ -1,9 +1,8 @@
-"use strict";
 const dbfuns = require('./db-functions.js');
 
 module.exports = {
     processAccount: async function(username, password, confirmpassword) {
-
+        "use strict";
         if(await checkIfUsernameExists(username) === true) {
             return false;
         }
