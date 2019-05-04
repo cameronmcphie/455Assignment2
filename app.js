@@ -132,11 +132,6 @@ app.post('/createaccount', function(req, res) {
 
 });
 
-app.get('/withdraw', function(req, res) {
-    "use strict";
-    requireLogin(req, res);
-
-});
 
 app.post('/withdraw', function(req, res) {
     "use strict";

@@ -9,6 +9,7 @@
 
     <body style="padding: 10%">
         <h1>Your Accounts</h1>
+        <hr>
         <div id="balances"></div>
     </body>
 
@@ -26,23 +27,32 @@
         function myFunction(xml) {
             var xmlDoc = xml.responseXML;
 
-            console.log(xmlDoc);
+            // console.log(xmlDoc);
             
             var tags = xmlDoc.getElementsByTagName('*');
-            for (let i = 0; i < tags.length; i++) {
+            for (let i = 1; i < tags.length; (i+=2)) {
+
                 let node = document.createElement("div");
-                let textnode = document.createTextNode(tags[i].firstChild.nodeValue);
-                if (textnode.data.includes("Account")) {
-                    let bold = document.createElement("STRONG");
-                    node.appendChild(bold);
-                    bold.appendChild(textnode)
-                }
-                else {
-                    node.appendChild(textnode);
-                }
+
+                node.innerHTML += "<h2>" + tags[i].firstChild.nodeValue + "</h2>"; 
+                node.innerHTML += "<br><strong>Balance: </strong>" + tags[i+1].firstChild.nodeValue + "<br><br>";
                 document.getElementById("balances").appendChild(node);
+                
+                let withdrawFormNode = document.createElement("form");
+                withdrawFormNode.action = "/withdraw";
+                withdrawFormNode.method = "POST";
+                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="amount" id="account">';
+                withdrawFormNode.innerHTML += '<input type="submit" value="Withdraw">';
+                document.getElementById("balances").appendChild(withdrawFormNode);
+
+                let depositFormNode = document.createElement("form");
+                depositFormNode.action = "/deposit";
+                depositFormNode.method = "POST";
+                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="amount" id="account">';
+                depositFormNode.innerHTML += '<input type="submit" value="Deposit"><br><br><hr>';
+                document.getElementById("balances").appendChild(depositFormNode);
             }
-        };
+        }
     </script>
 
 </html>
