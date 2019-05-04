@@ -15,6 +15,7 @@ module.exports = {
 };
 
 async function checkIfUsernameExists(username) {
+    "use strict";
     let awaitPromise = await dbfuns.getUser("select * from Users where username = ?", [username]);
     if(awaitPromise !== undefined) {
         return true;
@@ -25,6 +26,7 @@ async function checkIfUsernameExists(username) {
 };
 
 function checkConfirmedPassword(password, confirmpassword) {
+    "use strict";
     if(password === confirmpassword) {
         return true;
     }
@@ -34,5 +36,6 @@ function checkConfirmedPassword(password, confirmpassword) {
 };
 
 function createAccount(username, password) {
+    "use strict";
     dbfuns.createAccountQuery("insert into Users (username, password) values ('" + username +"', '" + password + "');");
 }

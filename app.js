@@ -2,9 +2,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('client-sessions');
+const parseString = require('xml2js').parseString;
+const fs = require('fs'), xml2js = require('xml2js');
+
 const ac = require('./account-creation.js');
 const lv = require('./login-verification');
 const dbfuns = require('./db-functions.js');
+const acc = require('./account.js');
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -29,7 +33,6 @@ app.use(function(req, res, next) {
             let check = await dbfuns.getUser("select * from Users where username = ?", [req.session.username]);
             if (req.session.username === check.username) {
                 req.session.user = check.username;  //refresh the session value
-                
             };
         }
         a();
@@ -41,6 +44,7 @@ app.use(function(req, res, next) {
   });
 
 function requireLogin (req, res) {
+    "use strict";
     if (!req.session.username) {
         req.session.reset();
         res.redirect('/');
@@ -48,16 +52,19 @@ function requireLogin (req, res) {
   };
 
 app.get('/', function(req, res) {
+    "use strict";
     // TODO: Add XSS Defenses
     res.sendFile(__dirname + "/html/index.html");
 });
 
 app.get('/createaccount', function(req, res) {
+    "use strict";
     // TODO: Add XSS Defenses
     res.sendFile(__dirname + "/html/createaccount.html");
 });
 
 app.post('/createaccount', function(req, res) {
+    "use strict";
     // TODO: Sanatize inputs
     async function a() {
         let accountCreationFulfilled = await ac.processAccount(req.body.username, req.body.password, req.body.confirmpassword);
@@ -76,12 +83,12 @@ app.post('/createaccount', function(req, res) {
 });
 
 app.post('/login', function (req, res) {
-
+    "use strict";
     async function a() {
         let loginSuccess = true;
-        loginSuccess = await lv.verifyLogin(req.body.username, req.body.password);
+        loginSuccess = await lv.verifyLogin(req.body.username, req.body.password, req);
         if (loginSuccess === true) {
-            // Start session
+            
             req.session.username = req.body.username;
 
             res.redirect('/account');
@@ -95,44 +102,68 @@ app.post('/login', function (req, res) {
 });
 
 app.get('/account', function(req, res) {
+    "use strict";
     requireLogin(req, res);
-    //res.send(req.session.username);
-
 
     res.sendFile(__dirname + "/html/account.html");
+    
 });
 
-app.post('/account', function(req, res) {
+app.get('/accountdata', function(req, res) {
+    "use strict";
+    async function a() {
+        let balances = await acc.getAccountsBalances(req, res)
+
+        var builder = new xml2js.Builder();
+        var xml = builder.buildObject(balances);
+
+        res.set('Content-Type', 'text/xml');
+        res.send(xml);
+    }
+    a();
+});
+
+app.post('/createaccount', function(req, res) {
+    "use strict";
+
     requireLogin(req, res);
+
+    //redirect for buttons
 
 });
 
 app.get('/withdraw', function(req, res) {
+    "use strict";
     requireLogin(req, res);
 
 });
 
 app.post('/withdraw', function(req, res) {
+    "use strict";
     requireLogin(req, res);
 
 });
 
 app.get('/deposit', function(req, res) {
+    "use strict";
     requireLogin(req, res);
 
 });
 
 app.post('/deposit', function(req, res) {
+    "use strict";
     requireLogin(req, res);
 
 });
 
 app.get('/transfer', function(req, res) {
+    "use strict";
     requireLogin(req, res);
 
 });
 
 app.post('/transfer', function(req, res) {
+    "use strict";
     requireLogin(req, res);
 
 });

@@ -1,12 +1,14 @@
 const dbfuns = require('./db-functions.js');
 
 module.exports = {
-    verifyLogin: async function(username, password) {
+    verifyLogin: async function(username, password, req) {
         "use strict";
         if(await checkIfUsernameExists(username) === false) {
             return false;
         }
         let dbrow = await dbfuns.getUser("select * from Users where username = ?", [username]);
+
+        req.session.userid = dbrow.userid;
 
         if (password === dbrow.password) {
             return true;

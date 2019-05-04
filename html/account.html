@@ -8,7 +8,41 @@
     </head>
 
     <body style="padding: 10%">
-        <h1>Your Accounts</h1> 
+        <h1>Your Accounts</h1>
+        <div id="balances"></div>
     </body>
+
+    <script>
+        "use strict";
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                myFunction(this);
+            }
+        };
+        xhttp.open("GET", "/accountdata", true);
+        xhttp.send();
+        
+        function myFunction(xml) {
+            var xmlDoc = xml.responseXML;
+
+            console.log(xmlDoc);
+            
+            var tags = xmlDoc.getElementsByTagName('*');
+            for (let i = 0; i < tags.length; i++) {
+                let node = document.createElement("div");
+                let textnode = document.createTextNode(tags[i].firstChild.nodeValue);
+                if (textnode.data.includes("Account")) {
+                    let bold = document.createElement("STRONG");
+                    node.appendChild(bold);
+                    bold.appendChild(textnode)
+                }
+                else {
+                    node.appendChild(textnode);
+                }
+                document.getElementById("balances").appendChild(node);
+            }
+        };
+    </script>
 
 </html>
