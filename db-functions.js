@@ -10,7 +10,9 @@ module.exports = {
                 if (err) { 
                     reject(new Error(err.message));
                 }
-                resolve(row);
+                else {
+                    resolve(row);
+                }
             });
             db.close();
         });
