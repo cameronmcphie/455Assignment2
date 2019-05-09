@@ -18,40 +18,74 @@
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                myFunction(this);
+                accountBalances(this);
             }
         };
         xhttp.open("GET", "/accountdata", true);
         xhttp.send();
         
-        function myFunction(xml) {
-            var xmlDoc = xml.responseXML;
+        function accountBalances(xml) {
+            "use strict";
+            let xmlDoc = xml.responseXML;
 
-            // console.log(xmlDoc);
+            //console.log(xmlDoc);
             
-            var tags = xmlDoc.getElementsByTagName('*');
-            for (let i = 1; i < tags.length; (i+=2)) {
+            let tags = xmlDoc.getElementsByTagName('*');
+            for (let i = 1; i < tags.length; (i+=3)) {
 
                 let node = document.createElement("div");
 
                 node.innerHTML += "<h2>" + tags[i].firstChild.nodeValue + "</h2>"; 
-                node.innerHTML += "<br><strong>Balance: </strong>" + tags[i+1].firstChild.nodeValue + "<br><br>";
+                node.innerHTML += "<br><strong>Balance: </strong>" + tags[i+2].firstChild.nodeValue + "<br><br>";
                 document.getElementById("balances").appendChild(node);
                 
                 let withdrawFormNode = document.createElement("form");
-                withdrawFormNode.action = "/withdraw";
-                withdrawFormNode.method = "POST";
-                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="amount" id="account">';
+                withdrawFormNode.action = "javascript:sendWithdrawXML("+tags[i+1].firstChild.nodeValue+");";
+                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="withdrawAmount" id="withdrawValue' + tags[i+1].firstChild.nodeValue + '">';
                 withdrawFormNode.innerHTML += '<input type="submit" value="Withdraw">';
                 document.getElementById("balances").appendChild(withdrawFormNode);
 
                 let depositFormNode = document.createElement("form");
-                depositFormNode.action = "/deposit";
-                depositFormNode.method = "POST";
-                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="amount" id="account">';
+                depositFormNode.action = "javascript:sendDepositXML("+tags[i+1].firstChild.nodeValue+");";
+                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="depositAmount" id="depositValue' + tags[i+1].firstChild.nodeValue + '">';
                 depositFormNode.innerHTML += '<input type="submit" value="Deposit"><br><br><hr>';
                 document.getElementById("balances").appendChild(depositFormNode);
             }
+        }
+
+        function sendWithdrawXML(i) {
+            "use strict";
+            //console.log(document.getElementById('withdrawValue'+i).value);
+            let withdrawString = "<withdraw><accountid>" + i + "</accountid>";
+            withdrawString += "<amount>" + document.getElementById('withdrawValue'+i).value + "</amount></withdraw>";
+
+            let parser = new DOMParser();
+            let xmlDoc = parser.parseFromString(withdrawString ,"text/xml");
+
+            // console.log(withdrawString);
+            // console.log(xmlDoc);
+            
+            let xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                    balanceChange();
+                }
+            };
+
+            xhttp2.open("POST", "/withdraw", true);
+            xhttp2.send(xmlDoc);
+        }
+
+        function sendDepositXML(i) {
+            "use strict";
+            //console.log(document.getElementById('depositValue'+i).value);
+            
+
+            
+        }
+
+        function balanceChange() {
+
         }
     </script>
 

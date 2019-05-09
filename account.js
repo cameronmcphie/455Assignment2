@@ -7,7 +7,7 @@ module.exports = {
         let tmpuserid = req.session.userid
         let db = new sqlite3.Database('bank.db');
 
-        let query = 'select balance from Accounts where users_userid = ?;';
+        let query = 'select accountid, balance from Accounts where users_userid = ?;';
         
         var results = {};
         var i = 1;
@@ -16,11 +16,14 @@ module.exports = {
                 if (err) {
                     throw err;
                 }
-                row.forEach((row) => {
-                    results['AccountName' + i] = 'Account ' + i;
-                    results['AccountBalance' + i] = row.balance;
-                    i++;
-                });
+                else {
+                    row.forEach((row) => {
+                        results['AccountName' + i] = 'Account ' + i;
+                        results['Accountid' + i] = row.accountid;
+                        results['AccountBalance' + i] = row.balance;
+                        i++;
+                    });
+                }
                 console.log(results);
                 resolve(results);
             });

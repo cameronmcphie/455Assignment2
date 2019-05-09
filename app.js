@@ -17,7 +17,7 @@ const port = 3000;
 // From https://stormpath.com/blog/everything-you-ever-wanted-to-know-about-node-dot-js-sessions 
 app.use(session({
     cookieName: 'session',
-    secret: 'how is it even possible to know that a randopm string is!?',
+    secret: 'how is it even possible to know that a random string is!?',
     duration: 180000,
     activeDuration: 180000,
     // duration: 30000,
@@ -136,12 +136,9 @@ app.post('/createaccount', function(req, res) {
 app.post('/withdraw', function(req, res) {
     "use strict";
     requireLogin(req, res);
-
-});
-
-app.get('/deposit', function(req, res) {
-    "use strict";
-    requireLogin(req, res);
+    console.log(req.body);
+    res.set('Content-Type', 'text/javascript')
+    res.send("<script>alert('test');</script>");
 
 });
 
