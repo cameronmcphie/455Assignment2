@@ -86,11 +86,13 @@
 
             if (res.response === 'true') {
                 alert('Success on Withdrawal or Deposit'); 
-                setInterval (function(){ window.location.href = "/account";}, 500);
+                // Because chrome doesn't like to wait
+                setInterval(function(){ window.location.href = "/account";}, 1000);
             }
             else {
                 alert('Failed to Withdraw or Deposit Money');
-                setInterval (function(){ window.location.href = "/account";}, 1000);
+                // Because chrome doesn't like to wait
+                setInterval(function(){ window.location.href = "/account";}, 1000);
             }
         }
     </script>

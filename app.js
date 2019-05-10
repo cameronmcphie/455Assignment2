@@ -10,6 +10,7 @@ const ac = require('./account-creation.js');
 const lv = require('./login-verification');
 const dbfuns = require('./db-functions.js');
 const acc = require('./account.js');
+const txn = require('./transaction.js')
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -142,15 +143,19 @@ app.post('/transaction', function(req, res) {
 
     requireLogin(req, res);
     res.set('Content-Type', 'text/xml');
-    res.send("true");
 
+    async function a() {
+        txn.accountTransaction(req, res);
+    }
+    a();
+    //res.send("true");
 });
 
-app.get('/transfer', function(req, res) {
-    "use strict";
-    requireLogin(req, res);
+// app.get('/transfer', function(req, res) {
+//     "use strict";
+//     requireLogin(req, res);
 
-});
+// });
 
 app.post('/transfer', function(req, res) {
     "use strict";
