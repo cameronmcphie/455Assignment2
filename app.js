@@ -1,6 +1,7 @@
 "use strict";
 const express = require('express');
 const bodyParser = require('body-parser');
+var xmlparser = require('express-xml-bodyparser');
 const session = require('client-sessions');
 const parseString = require('xml2js').parseString;
 const fs = require('fs'), xml2js = require('xml2js');
@@ -12,6 +13,7 @@ const acc = require('./account.js');
 
 var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(xmlparser());
 const port = 3000;
 
 // From https://stormpath.com/blog/everything-you-ever-wanted-to-know-about-node-dot-js-sessions 
@@ -133,18 +135,14 @@ app.post('/createaccount', function(req, res) {
 });
 
 
-app.post('/withdraw', function(req, res) {
+app.post('/transaction', function(req, res) {
     "use strict";
-    requireLogin(req, res);
     console.log(req.body);
-    res.set('Content-Type', 'text/javascript')
-    res.send("<script>alert('test');</script>");
 
-});
 
-app.post('/deposit', function(req, res) {
-    "use strict";
     requireLogin(req, res);
+    res.set('Content-Type', 'text/xml');
+    res.send("true");
 
 });
 

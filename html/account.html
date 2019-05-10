@@ -40,52 +40,58 @@
                 document.getElementById("balances").appendChild(node);
                 
                 let withdrawFormNode = document.createElement("form");
-                withdrawFormNode.action = "javascript:sendWithdrawXML("+tags[i+1].firstChild.nodeValue+");";
-                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="withdrawAmount" id="withdrawValue' + tags[i+1].firstChild.nodeValue + '">';
+                withdrawFormNode.action = "javascript:sendActionXML("+tags[i+1].firstChild.nodeValue+");";
+                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="withdraw" id="withdrawValue' + tags[i+1].firstChild.nodeValue + '">';
                 withdrawFormNode.innerHTML += '<input type="submit" value="Withdraw">';
                 document.getElementById("balances").appendChild(withdrawFormNode);
 
                 let depositFormNode = document.createElement("form");
-                depositFormNode.action = "javascript:sendDepositXML("+tags[i+1].firstChild.nodeValue+");";
-                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="depositAmount" id="depositValue' + tags[i+1].firstChild.nodeValue + '">';
+                depositFormNode.action = "javascript:sendActionXML("+tags[i+1].firstChild.nodeValue+");";
+                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="deposit" id="depositValue' + tags[i+1].firstChild.nodeValue + '">';
                 depositFormNode.innerHTML += '<input type="submit" value="Deposit"><br><br><hr>';
                 document.getElementById("balances").appendChild(depositFormNode);
             }
+            //console.log(tags);
         }
 
-        function sendWithdrawXML(i) {
+        function sendActionXML(i) {
             "use strict";
             //console.log(document.getElementById('withdrawValue'+i).value);
-            let withdrawString = "<withdraw><accountid>" + i + "</accountid>";
-            withdrawString += "<amount>" + document.getElementById('withdrawValue'+i).value + "</amount></withdraw>";
+            let accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><'+document.getElementById('withdrawValue'+i).name+'><accountid>' + i + "</accountid>";
+            accountActionString += "<amount>" + document.getElementById('withdrawValue'+i).value + "</amount></"+document.getElementById('withdrawValue'+i).name+">";
 
             let parser = new DOMParser();
-            let xmlDoc = parser.parseFromString(withdrawString ,"text/xml");
+            let xmlDoc = parser.parseFromString(accountActionString ,"text/xml");
 
-            // console.log(withdrawString);
+            console.log(accountActionString);
             // console.log(xmlDoc);
             
             let xhttp2 = new XMLHttpRequest();
             xhttp2.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                    balanceChange();
+                    balanceUpdate(this);
                 }
             };
 
-            xhttp2.open("POST", "/withdraw", true);
-            xhttp2.send(xmlDoc);
+            xhttp2.open("POST", "/transaction", true);
+            xhttp2.setRequestHeader("Content-type", "application/xml");
+            xhttp2.send(accountActionString);
+            
         }
 
-        function sendDepositXML(i) {
+        function balanceUpdate(res) {
             "use strict";
-            //console.log(document.getElementById('depositValue'+i).value);
-            
 
-            
-        }
+            //console.log(res);
 
-        function balanceChange() {
-
+            if (res.response === 'true') {
+                alert('Success on Withdrawal or Deposit'); 
+                setInterval (function(){ window.location.href = "/account";}, 500);
+            }
+            else {
+                alert('Failed to Withdraw or Deposit Money');
+                setInterval (function(){ window.location.href = "/account";}, 1000);
+            }
         }
     </script>
 
