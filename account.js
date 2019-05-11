@@ -18,7 +18,6 @@ module.exports = {
                 }
                 else {
                     row.forEach((row) => {
-                        results['AccountName' + i] = 'Account ' + i;
                         results['Accountid' + i] = row.accountid;
                         results['AccountBalance' + i] = row.balance;
                         i++;

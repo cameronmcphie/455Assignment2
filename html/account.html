@@ -31,40 +31,61 @@
             //console.log(xmlDoc);
             
             let tags = xmlDoc.getElementsByTagName('*');
-            for (let i = 1; i < tags.length; (i+=3)) {
+            for (let i = 1; i < (tags.length-1); (i+=2)) {
 
                 let node = document.createElement("div");
 
-                node.innerHTML += "<h2>" + tags[i].firstChild.nodeValue + "</h2>"; 
-                node.innerHTML += "<br><strong>Balance: </strong>" + tags[i+2].firstChild.nodeValue + "<br><br>";
+                node.innerHTML += "<h2>Account "+tags[i].firstChild.nodeValue+"</h2>"; 
+                node.innerHTML += "<br><strong>Balance: </strong>" + tags[i+1].firstChild.nodeValue + "<br><br>";
                 document.getElementById("balances").appendChild(node);
                 
                 let withdrawFormNode = document.createElement("form");
-                withdrawFormNode.action = "javascript:sendActionXML("+tags[i+1].firstChild.nodeValue+");";
-                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="withdraw" id="withdrawValue' + tags[i+1].firstChild.nodeValue + '">';
+                withdrawFormNode.action = "javascript:sendActionXML("+tags[i].firstChild.nodeValue+", 1);";
+                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="withdraw" id="withdrawValue' + tags[i].firstChild.nodeValue + '">';
                 withdrawFormNode.innerHTML += '<input type="submit" value="Withdraw">';
                 document.getElementById("balances").appendChild(withdrawFormNode);
 
                 let depositFormNode = document.createElement("form");
-                depositFormNode.action = "javascript:sendActionXML("+tags[i+1].firstChild.nodeValue+");";
-                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="deposit" id="depositValue' + tags[i+1].firstChild.nodeValue + '">';
-                depositFormNode.innerHTML += '<input type="submit" value="Deposit"><br><br><hr>';
+                depositFormNode.action = "javascript:sendActionXML("+tags[i].firstChild.nodeValue+", 2);";
+                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="deposit" id="depositValue' + tags[i].firstChild.nodeValue + '">';
+                depositFormNode.innerHTML += '<input type="submit" value="Deposit">';
                 document.getElementById("balances").appendChild(depositFormNode);
+
+                let transferFormNode = document.createElement("form");
+                transferFormNode.action = "javascript:sendActionXML("+tags[i].firstChild.nodeValue+", 3);";
+                let tmpinnerHTML = '<input type="number" min="0.00" step="0.01" name="transfer" id="transferValue' + tags[i].firstChild.nodeValue + '">';
+                tmpinnerHTML += '<select name="transferAmount">';
+                for (let j = 1; j < (tags.length-1); (j+=2)) {
+                    tmpinnerHTML += '<option value="'+tags[j].firstChild.nodeValue+'">Account'+tags[j].firstChild.nodeValue+'</option>';
+                }
+                tmpinnerHTML += '<input type="submit" value="Transfer">';
+                tmpinnerHTML += '<br><br><hr>';
+                transferFormNode.innerHTML = tmpinnerHTML;
+                document.getElementById("balances").appendChild(transferFormNode);
             }
             //console.log(tags);
         }
 
-        function sendActionXML(i) {
+        function sendActionXML(i,actionType) {
             "use strict";
-            //console.log(document.getElementById('withdrawValue'+i).value);
-            let accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><'+document.getElementById('withdrawValue'+i).name+'><accountid>' + i + "</accountid>";
-            accountActionString += "<amount>" + document.getElementById('withdrawValue'+i).value + "</amount></"+document.getElementById('withdrawValue'+i).name+">";
+            let accountActionString;
 
+            if (actionType === 1) {
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('withdrawValue'+i).name+'</action><accountid>' + i + "</accountid>";
+                accountActionString += "<amount>" + document.getElementById('withdrawValue'+i).value + "</amount></transaction>";
+            }
+            else if (actionType === 2) {
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('depositValue'+i).name+'</action><accountid>' + i + "</accountid>";
+                accountActionString += "<amount>" + document.getElementById('depositValue'+i).value + "</amount></transaction>";
+            }
+            else if (actionType === 3){
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('depositValue'+i).name+'</action><accountid>' + i + "</accountid>";
+                accountActionString += "<amount>" + document.getElementById('depositValue'+i).value + "</amount></transaction>";
+            }
             let parser = new DOMParser();
             let xmlDoc = parser.parseFromString(accountActionString ,"text/xml");
 
-            console.log(accountActionString);
-            // console.log(xmlDoc);
+            console.log(xmlDoc);
             
             let xhttp2 = new XMLHttpRequest();
             xhttp2.onreadystatechange = function() {
@@ -85,12 +106,12 @@
             //console.log(res);
 
             if (res.response === 'true') {
-                alert('Success on Withdrawal or Deposit'); 
+                alert('Success on Withdrawal, Deposit, or Transfer'); 
                 // Because chrome doesn't like to wait
                 setInterval(function(){ window.location.href = "/account";}, 1000);
             }
             else {
-                alert('Failed to Withdraw or Deposit Money');
+                alert('Failed to Withdraw, Deposit, or Transfer Money');
                 // Because chrome doesn't like to wait
                 setInterval(function(){ window.location.href = "/account";}, 1000);
             }
