@@ -3,19 +3,25 @@ const sqlite3 = require('sqlite3').verbose();
 module.exports = {
 
     accountTransaction: async function (req, res) {
-            "use strict";
+        "use strict";
 
-            let query = 'select accountid from Accounts where users_userid=?;';
+        let query = 'select accountid from Accounts where users_userid=?;';
 
-            var doesBelongToUser = await checkIfAccountBelongsToUser(req, query);
+        var doesBelongToUser = await checkIfAccountBelongsToUser(req, query);
 
-            console.log(doesBelongToUser);
+        if (!doesBelongToUser) {
+            res.send('false');
+        }
+        else {
+            //TODO: Update balance of account
+            let body = req.body.transaction;
+
             
-            //TODO: Update balance of account 
 
             res.send('true');
         }
-
+            
+    }
 };
 
 function checkIfAccountBelongsToUser(req, query) {
@@ -34,11 +40,10 @@ function checkIfAccountBelongsToUser(req, query) {
             else {
                 row.forEach((row) => {
                     // TODO get account id
-                    if(row.accountid == req.body.withdraw.accountid[0]) {
+                    if(row.accountid == req.body.transaction.accountid[0]) {
                         accountBelongstoUser = true;
                     }
                 });
-                console.log(accountBelongstoUser);
                 resolve(accountBelongstoUser);
             }
         });
