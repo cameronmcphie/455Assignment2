@@ -138,7 +138,7 @@ app.post('/createaccount', function(req, res) {
 
 app.post('/transaction', function(req, res) {
     "use strict";
-    console.log(req.body);
+    //console.log(typeof(req.body.withdraw.accountid[0]));
 
 
     requireLogin(req, res);
