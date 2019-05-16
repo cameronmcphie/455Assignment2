@@ -30,6 +30,12 @@ app.use(session({
     ephemeral: true
   }));
 
+// From https://medium.com/dailyjs/how-to-prevent-your-node-js-process-from-crashing-5d40247b8ab2
+// For taking care of unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+    console.log('Unhandled Rejection at:', reason.stack || reason)
+});
+
 app.use(function(req, res, next) {
     if (req.session && req.session.username) {
         async function a() {
