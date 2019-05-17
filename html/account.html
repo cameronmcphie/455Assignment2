@@ -19,6 +19,8 @@
         <a href="/logout">Logout</a>
     </body>
 
+    <script src="dist/xss-filters.1.2.7.min.js"></script>
+
     <script>
         "use strict";
         var xhttp = new XMLHttpRequest();
@@ -39,30 +41,30 @@
 
                 let node = document.createElement("div");
 
-                node.innerHTML += "<h2>Account "+tags[i].firstChild.nodeValue+"</h2>"; 
-                node.innerHTML += "<br><strong>Balance: </strong>" + tags[i+1].firstChild.nodeValue + "<br><br>";
+                node.innerHTML += "<h2>Account "+xssFilters.inHTMLData(tags[i].firstChild.nodeValue)+"</h2>"; 
+                node.innerHTML += "<br><strong>Balance: </strong>" + xssFilters.inHTMLData(tags[i+1].firstChild.nodeValue) + "<br><br>";
                 document.getElementById("balances").appendChild(node);
                 
                 let withdrawFormNode = document.createElement("form");
-                withdrawFormNode.action = "javascript:sendActionXML("+tags[i].firstChild.nodeValue+", 1);";
-                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="withdraw" id="withdrawValue' + tags[i].firstChild.nodeValue + '">';
+                withdrawFormNode.action = "javascript:sendActionXML("+xssFilters.inHTMLData(tags[i].firstChild.nodeValue)+", 1);";
+                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="withdraw" id="withdrawValue' + xssFilters.inHTMLData(tags[i].firstChild.nodeValue) + '">';
                 withdrawFormNode.innerHTML += '<input type="submit" value="Withdraw">';
                 document.getElementById("balances").appendChild(withdrawFormNode);
 
                 let depositFormNode = document.createElement("form");
-                depositFormNode.action = "javascript:sendActionXML("+tags[i].firstChild.nodeValue+", 2);";
-                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="deposit" id="depositValue' + tags[i].firstChild.nodeValue + '">';
+                depositFormNode.action = "javascript:sendActionXML("+xssFilters.inHTMLData(tags[i].firstChild.nodeValue)+", 2);";
+                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="deposit" id="depositValue' + xssFilters.inHTMLData(tags[i].firstChild.nodeValue) + '">';
                 depositFormNode.innerHTML += '<input type="submit" value="Deposit">';
                 document.getElementById("balances").appendChild(depositFormNode);
 
                 let transferFormNode = document.createElement("form");
-                transferFormNode.action = "javascript:sendActionXML("+tags[i].firstChild.nodeValue+", 3);";
-                let tmpinnerHTML = '<input type="number" min="0.00" step="0.01" name="transfer" id="transferValue' + tags[i].firstChild.nodeValue + '">';
-                tmpinnerHTML += '<select name="transferAmount" id="transferToAccount'+ tags[i].firstChild.nodeValue +'">';
+                transferFormNode.action = "javascript:sendActionXML("+xssFilters.inHTMLData(tags[i].firstChild.nodeValue)+", 3);";
+                let tmpinnerHTML = '<input type="number" min="0.00" step="0.01" name="transfer" id="transferValue' + xssFilters.inHTMLData(tags[i].firstChild.nodeValue) + '">';
+                tmpinnerHTML += '<select name="transferAmount" id="transferToAccount'+ xssFilters.inHTMLData(tags[i].firstChild.nodeValue) +'">';
                 tmpinnerHTML += '<option value="select">Select Account</option>';
                 for (let j = 1; j < (tags.length-1); (j+=2)) {
                     if(j!== i) {
-                    tmpinnerHTML += '<option value="'+tags[j].firstChild.nodeValue+'">Account'+tags[j].firstChild.nodeValue+'</option>';
+                    tmpinnerHTML += '<option value="'+xssFilters.inHTMLData(tags[j].firstChild.nodeValue)+'">Account'+xssFilters.inHTMLData(tags[j].firstChild.nodeValue)+'</option>';
                     }
                 }
                 tmpinnerHTML += '<input type="submit" value="Transfer">';
@@ -78,18 +80,18 @@
 
 
             if (actionType === 1) {
-                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('withdrawValue'+i).name+'</action><accountid>' + i + "</accountid>";
-                accountActionString += "<amount>" + document.getElementById('withdrawValue'+i).value + "</amount></transaction>";
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+xssFilters.inHTMLData(document.getElementById('withdrawValue'+i).name)+'</action><accountid>' + i + "</accountid>";
+                accountActionString += "<amount>" + xssFilters.inHTMLData(document.getElementById('withdrawValue'+i).value) + "</amount></transaction>";
             }
             else if (actionType === 2) {
-                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('depositValue'+i).name+'</action><accountid>' + i + "</accountid>";
-                accountActionString += "<amount>" + document.getElementById('depositValue'+i).value + "</amount></transaction>";
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+xssFilters.inHTMLData(document.getElementById('depositValue'+i).name)+'</action><accountid>' + i + "</accountid>";
+                accountActionString += "<amount>" + xssFilters.inHTMLData(document.getElementById('depositValue'+i).value) + "</amount></transaction>";
             }
             else if (actionType === 3) {
-                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('transferValue'+i).name+'</action><accountid>' + i + "</accountid>";
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+xssFilters.inHTMLData(document.getElementById('transferValue'+i).name)+'</action><accountid>' + i + "</accountid>";
                 let dropdownElement = document.getElementById("transferToAccount"+i);
-                accountActionString += '<transferto>'+dropdownElement.options[dropdownElement.selectedIndex].value+'</transferto>';
-                accountActionString += "<amount>" + document.getElementById('transferValue'+i).value + "</amount></transaction>";
+                accountActionString += '<transferto>'+xssFilters.inHTMLData(dropdownElement.options[dropdownElement.selectedIndex].value)+'</transferto>';
+                accountActionString += "<amount>" + xssFilters.inHTMLData(document.getElementById('transferValue'+i).value) + "</amount></transaction>";
             }
             let parser = new DOMParser();
             let xmlDoc = parser.parseFromString(accountActionString ,"text/xml");
@@ -104,7 +106,7 @@
             xhttp2.open("POST", "/transaction", true);
             xhttp2.setRequestHeader("Content-type", "application/xml");
             xhttp2.send(accountActionString);
-            
+
         }
 
         function balanceUpdate(res) {
@@ -121,5 +123,4 @@
             }
         }
     </script>
-
 </html>

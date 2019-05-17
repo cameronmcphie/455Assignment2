@@ -5,6 +5,7 @@ var xmlparser = require('express-xml-bodyparser');
 const session = require('client-sessions');
 const parseString = require('xml2js').parseString;
 const fs = require('fs'), xml2js = require('xml2js');
+var xssFilters = require('xss-filters');
 
 const ac = require('./account-creation.js');
 const lv = require('./login-verification');
@@ -140,9 +141,12 @@ app.get('/accountdata', async function(req, res) {
 
     if(req.session.username) {
         let balances = await acc.getAccountsBalances(req, res)
+        
+        console.log(balances);
 
         var builder = new xml2js.Builder();
         var xml = builder.buildObject(balances);
+
 
         res.set('Content-Type', 'text/xml');
         res.send(xml);
@@ -172,12 +176,16 @@ app.post('/transaction', function(req, res) {
 // The logout function your sessions code example
 // @param req - the request
 // @param res - the response
-app.get('/logout', function(req, res){
+app.get('/logout', function(req, res) {
 
 	// Kill the session
 	req.session.reset();
 	
 	res.redirect('/');
+});
+
+app.get('/dist/xss-filters.1.2.7.min.js', function(req, res) {
+    res.sendFile(__dirname + '/dist/xss-filters.1.2.7.min.js');
 });
 
 app.listen(port);

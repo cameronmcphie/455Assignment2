@@ -15,7 +15,6 @@ module.exports = {
             res.send('false');
         }
         else {
-            //TODO: Update balance of account
             let transactionType = req.body.transaction.action[0];
             let accountId = req.body.transaction.accountid[0];
             let amount = parseFloat(req.body.transaction.amount[0]);

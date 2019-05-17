@@ -1,4 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
+var xssFilters = require('xss-filters');
 
 module.exports = {
     getAccountsBalances: async function(req, res) {
@@ -18,8 +19,8 @@ module.exports = {
                 }
                 else {
                     row.forEach((row) => {
-                        results['Accountid' + i] = row.accountid;
-                        results['AccountBalance' + i] = row.balance;
+                        results['Accountid' + i] = xssFilters.inHTMLData(row.accountid);
+                        results['AccountBalance' + i] = xssFilters.inHTMLData(row.balance);
                         i++;
                     });
                 }
