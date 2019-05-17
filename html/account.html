@@ -19,6 +19,7 @@
         <a href="/logout">Logout</a>
     </body>
 
+    <script type="text/javascript" src="dist/purify.min.js"></script>
     <script src="dist/xss-filters.1.2.7.min.js"></script>
 
     <script>
@@ -40,21 +41,26 @@
             for (let i = 1; i < (tags.length-1); (i+=2)) {
 
                 let node = document.createElement("div");
-
-                node.innerHTML += "<h2>Account "+xssFilters.inHTMLData(tags[i].firstChild.nodeValue)+"</h2>"; 
-                node.innerHTML += "<br><strong>Balance: </strong>" + xssFilters.inHTMLData(tags[i+1].firstChild.nodeValue) + "<br><br>";
+                let headerNode = "<h2>Account "+xssFilters.inHTMLData(tags[i].firstChild.nodeValue)+"</h2>"; 
+                headerNode += "<br><strong>Balance: </strong>" + xssFilters.inHTMLData(tags[i+1].firstChild.nodeValue) + "<br><br>";
+                var cleanNode = DOMPurify.sanitize(headerNode);
+                node.innerHTML = cleanNode;
                 document.getElementById("balances").appendChild(node);
-                
+
                 let withdrawFormNode = document.createElement("form");
                 withdrawFormNode.action = "javascript:sendActionXML("+xssFilters.inHTMLData(tags[i].firstChild.nodeValue)+", 1);";
-                withdrawFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="withdraw" id="withdrawValue' + xssFilters.inHTMLData(tags[i].firstChild.nodeValue) + '">';
-                withdrawFormNode.innerHTML += '<input type="submit" value="Withdraw">';
+                let withdrawForm = '<input type="number" min="0.00" step="0.01" name="withdraw" id="withdrawValue' + xssFilters.inHTMLData(tags[i].firstChild.nodeValue) + '">';
+                withdrawForm += '<input type="submit" value="Withdraw">';
+                var cleanwithdrawForm = DOMPurify.sanitize(withdrawForm);
+                withdrawFormNode.innerHTML = cleanwithdrawForm;
                 document.getElementById("balances").appendChild(withdrawFormNode);
 
                 let depositFormNode = document.createElement("form");
                 depositFormNode.action = "javascript:sendActionXML("+xssFilters.inHTMLData(tags[i].firstChild.nodeValue)+", 2);";
-                depositFormNode.innerHTML += '<input type="number" min="0.00" step="0.01" name="deposit" id="depositValue' + xssFilters.inHTMLData(tags[i].firstChild.nodeValue) + '">';
-                depositFormNode.innerHTML += '<input type="submit" value="Deposit">';
+                let depositForm = '<input type="number" min="0.00" step="0.01" name="deposit" id="depositValue' + xssFilters.inHTMLData(tags[i].firstChild.nodeValue) + '">';
+                depositForm += '<input type="submit" value="Deposit">';
+                var cleandepositForm = DOMPurify.sanitize(depositForm);
+                depositFormNode.innerHTML = depositForm;
                 document.getElementById("balances").appendChild(depositFormNode);
 
                 let transferFormNode = document.createElement("form");
@@ -69,7 +75,8 @@
                 }
                 tmpinnerHTML += '<input type="submit" value="Transfer">';
                 tmpinnerHTML += '<br><br><hr>';
-                transferFormNode.innerHTML = tmpinnerHTML;
+                var cleantmpinnerHTML = DOMPurify.sanitize(tmpinnerHTML);
+                transferFormNode.innerHTML = cleantmpinnerHTML;
                 document.getElementById("balances").appendChild(transferFormNode);
             }
         }

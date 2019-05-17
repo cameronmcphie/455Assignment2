@@ -177,7 +177,7 @@ app.post('/transaction', function(req, res) {
 // @param req - the request
 // @param res - the response
 app.get('/logout', function(req, res) {
-
+    "use strict";
 	// Kill the session
 	req.session.reset();
 	
@@ -185,7 +185,13 @@ app.get('/logout', function(req, res) {
 });
 
 app.get('/dist/xss-filters.1.2.7.min.js', function(req, res) {
+    "use strict";
     res.sendFile(__dirname + '/dist/xss-filters.1.2.7.min.js');
+});
+
+app.get('/dist/purify.min.js', function (req, res) {
+    "use strict";
+    res.sendFile(__dirname + "/dist/purify.min.js");
 });
 
 app.listen(port);
