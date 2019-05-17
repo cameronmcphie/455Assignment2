@@ -52,16 +52,9 @@ app.use(function(req, res, next) {
     }
   });
 
-function requireLogin (req, res) {
-    "use strict";
-    if (!req.session.username) {
-        req.session.reset();
-        res.redirect('/');
-    }
-  };
-
 app.get('/', function(req, res) {
     "use strict";
+    req.session.reset();
     // TODO: Add XSS Defenses
     res.sendFile(__dirname + "/html/index.html");
 });
@@ -110,17 +103,37 @@ app.post('/login', function (req, res) {
 
 });
 
+app.post('/createaccount', function(req, res) {
+    "use strict";
+
+    if(req.session.username) {
+        // TODO: Create account code
+    }
+    else {
+        req.session.reset();
+        res.redirect('/');
+    }
+});
+
+
 app.get('/account', function(req, res) {
     "use strict";
-    requireLogin(req, res);
 
-    res.sendFile(__dirname + "/html/account.html");
+    if(req.session.username) {
+        res.sendFile(__dirname + "/html/account.html");
+    }
+    else {
+        req.session.reset();
+        res.redirect('/');
+    }
     
 });
 
-app.get('/accountdata', function(req, res) {
+
+app.get('/accountdata', async function(req, res) {
     "use strict";
-    async function a() {
+
+    if(req.session.username) {
         let balances = await acc.getAccountsBalances(req, res)
 
         var builder = new xml2js.Builder();
@@ -129,16 +142,10 @@ app.get('/accountdata', function(req, res) {
         res.set('Content-Type', 'text/xml');
         res.send(xml);
     }
-    a();
-});
-
-app.post('/createaccount', function(req, res) {
-    "use strict";
-
-    requireLogin(req, res);
-
-    //redirect for buttons
-
+    else {
+        req.session.reset();
+        res.redirect('/');
+    }
 });
 
 
@@ -146,27 +153,26 @@ app.post('/transaction', function(req, res) {
     "use strict";
     //console.log(typeof(req.body.withdraw.accountid[0]));
 
+    //console.log(req.session.username);
 
-    requireLogin(req, res);
-    res.set('Content-Type', 'text/xml');
-
-    async function a() {
+    if(req.session.username) {
         txn.accountTransaction(req, res);
     }
-    a();
-    //res.send("true");
+    else {
+        req.session.reset();
+        res.redirect('/');
+    }
 });
 
-// app.get('/transfer', function(req, res) {
-//     "use strict";
-//     requireLogin(req, res);
+// The logout function your sessions code example
+// @param req - the request
+// @param res - the response
+app.get('/logout', function(req, res){
 
-// });
-
-app.post('/transfer', function(req, res) {
-    "use strict";
-    requireLogin(req, res);
-
+	// Kill the session
+	req.session.reset();
+	
+	res.redirect('/');
 });
 
 app.listen(port);
