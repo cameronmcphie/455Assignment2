@@ -61,6 +61,4 @@ module.exports = {
 
         db.close();
     }
-
-    
 };

@@ -9,18 +9,99 @@
 
     <body style="padding: 10%">
         <h1>Create Account</h1>
-        <form action="/createaccount" method="POST">
-            <strong>Username: </strong><input type="text" name="username" id="username"><br><br>
-            <strong>Password: </strong><input type="password" name="password" id="username"><br><br>
-            <strong>Confirm Password: </strong><input type="password" name="confirmpassword" id="username"><br><br>
-            <strong>First Name: </strong><input type="text" name="firstname" id="firstname"><br><br>
-            <strong>Last Name: </strong><input type="text" name="lastname" id="lastname"><br><br>
-            <strong>Address: </strong><input type="text" name="address" id="address"><br><br>
+        <strong>Password must be longer then 10 characters.</strong><br>
+        <strong>Password must meet at least 3 out of the following 4 complexity rules:</strong>
+        <li>Contain at least 1 uppercase character (A-Z)</li>
+        <li>At least 1 lowercase character (a-z)</li>
+        <li>At least 1 digit (0-9)</li>
+        <li>At least 1 special character</li>
+        <br>
+
+        <!-- action="/createaccount" method="POST" -->
+        <form onsubmit="return checkForm(this);" action="/createaccount" method="POST">
+            <strong>Username: </strong><input type="text" name="username" id="username" ><br><br>
+            <strong>Password: </strong><input type="password" name="password" id="password" required><br><br>
+            <strong>Confirm Password: </strong><input type="password" name="confirmpassword" id="confirmpassword" required><br><br>
+            <strong>First Name: </strong><input type="text" name="firstname" id="firstname" required><br><br>
+            <strong>Last Name: </strong><input type="text" name="lastname" id="lastname" required><br><br>
+            <strong>Address: </strong><input type="text" name="address" id="address" required><br><br>
             <input type="submit" value="Submit"><br>
         </form>
-        <br><br>
+        <br>
+
+
+
         <strong>Account was not created if your are redirected back to this page.</strong><br>
         <strong>Account was created if you are redirect to the homepage.</strong>
 </body>
+
+<script>
+    function checkForm(form) {
+        "use strict;"
+
+        if(form.username.value.length < 1) {
+            alert("Username cannot be blank");
+            form.username.focus();
+            return false;
+        }
+        
+        if(form.password.value != "" && form.password.value == form.confirmpassword.value) {
+            
+            let complexityReqs = 0;
+            let complexityFlag = false;
+
+            if(!(form.password.value.length > 10)) {
+                alert("Password must be at least ten characters");
+                form.password.focus();
+                return false;
+            }
+
+            let regex = /[0-9]/;
+            if(regex.test(form.password.value)) {
+                complexityReqs += 1;
+            }
+
+            regex = /[a-z]/;
+            if(regex.test(form.password.value)) {
+                complexityReqs += 1;
+            }
+
+            regex = /[A-Z]/;
+            if(regex.test(form.password.value)) {
+                complexityReqs += 1;
+            }
+            regex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+            if(regex.test(form.password.value)) {
+                complexityReqs += 1;
+            }
+
+            if (complexityReqs < 3) {
+                alert("Password must meet 3 out of the 4 complexity rules");
+                form.password.focus();
+                return false;
+            }
+        } 
+        else {
+            alert("Please check that you've entered and confirmed your password");
+            form.password.focus();
+            return false;
+        }
+        if(form.firstname.value < 1) {
+            alert("First Name cannot be blank");
+            form.username.focus();
+            return false;
+        }
+        if(form.lastname.value < 1) {
+            alert("Last Name cannot be blank");
+            form.username.focus();
+            return false;
+        }
+        if(form.address.value.length < 1) {
+            alert("Address cannot be blank");
+            form.username.focus();
+            return false;
+        }  
+    }
+</script>
 
 </html>
