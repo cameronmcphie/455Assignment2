@@ -12,6 +12,10 @@
         <hr>
         <div id="balances"></div>
 
+        <form action="/createbankaccount" method="POST">
+            <button name="createaccount" type="submit">Create Bank Account</button>
+        </form>
+
         <a href="/logout">Logout</a>
     </body>
 
@@ -29,8 +33,6 @@
         function accountBalances(xml) {
             "use strict";
             let xmlDoc = xml.responseXML;
-
-            //console.log(xmlDoc);
             
             let tags = xmlDoc.getElementsByTagName('*');
             for (let i = 1; i < (tags.length-1); (i+=2)) {
@@ -68,55 +70,45 @@
                 transferFormNode.innerHTML = tmpinnerHTML;
                 document.getElementById("balances").appendChild(transferFormNode);
             }
-            //console.log(tags);
         }
 
         function sendActionXML(i,actionType, transferToAccount) {
             "use strict";
             let accountActionString;
 
-            try {
-                if (actionType === 1) {
-                    accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('withdrawValue'+i).name+'</action><accountid>' + i + "</accountid>";
-                    accountActionString += "<amount>" + document.getElementById('withdrawValue'+i).value + "</amount></transaction>";
-                }
-                else if (actionType === 2) {
-                    accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('depositValue'+i).name+'</action><accountid>' + i + "</accountid>";
-                    accountActionString += "<amount>" + document.getElementById('depositValue'+i).value + "</amount></transaction>";
-                }
-                else if (actionType === 3) {
-                    accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('transferValue'+i).name+'</action><accountid>' + i + "</accountid>";
-                    let dropdownElement = document.getElementById("transferToAccount"+i);
-                    accountActionString += '<transferto>'+dropdownElement.options[dropdownElement.selectedIndex].value+'</transferto>';
-                    accountActionString += "<amount>" + document.getElementById('transferValue'+i).value + "</amount></transaction>";
-                }
-                let parser = new DOMParser();
-                let xmlDoc = parser.parseFromString(accountActionString ,"text/xml");
 
-                console.log(xmlDoc);
-                
-                let xhttp2 = new XMLHttpRequest();
-                xhttp2.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                        balanceUpdate(this);
-                    }
-                };
+            if (actionType === 1) {
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('withdrawValue'+i).name+'</action><accountid>' + i + "</accountid>";
+                accountActionString += "<amount>" + document.getElementById('withdrawValue'+i).value + "</amount></transaction>";
+            }
+            else if (actionType === 2) {
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('depositValue'+i).name+'</action><accountid>' + i + "</accountid>";
+                accountActionString += "<amount>" + document.getElementById('depositValue'+i).value + "</amount></transaction>";
+            }
+            else if (actionType === 3) {
+                accountActionString = '<?xml version="1.0" encoding="UTF-8" ?><transaction><action>'+document.getElementById('transferValue'+i).name+'</action><accountid>' + i + "</accountid>";
+                let dropdownElement = document.getElementById("transferToAccount"+i);
+                accountActionString += '<transferto>'+dropdownElement.options[dropdownElement.selectedIndex].value+'</transferto>';
+                accountActionString += "<amount>" + document.getElementById('transferValue'+i).value + "</amount></transaction>";
+            }
+            let parser = new DOMParser();
+            let xmlDoc = parser.parseFromString(accountActionString ,"text/xml");
+            
+            let xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                    balanceUpdate(this);
+                }
+            };
 
-                xhttp2.open("POST", "/transaction", true);
-                xhttp2.setRequestHeader("Content-type", "application/xml");
-                xhttp2.send(accountActionString);
-            }
-            catch(err) {
-                //console.log(err);
-                alert('Failed to Withdraw, Deposit, or Transfer Money');
-            }
+            xhttp2.open("POST", "/transaction", true);
+            xhttp2.setRequestHeader("Content-type", "application/xml");
+            xhttp2.send(accountActionString);
+            
         }
 
-        async function balanceUpdate(res) {
+        function balanceUpdate(res) {
             "use strict";
-
-            //console.log(res);
-
             if (res.response === 'true') {
                 alert('Success on Withdrawal, Deposit, or Transfer'); 
                 // Because chrome doesn't like to wait

@@ -3,7 +3,10 @@ DROP TABLE IF EXISTS Accounts;
 
 CREATE TABLE Users (
     userid INTEGER PRIMARY KEY AUTOINCREMENT, 
-    username TEXT NOT NULL UNIQUE, 
+    username TEXT NOT NULL UNIQUE,
+    firstname TEXT NOT NULL,
+    lastname TEXT NOT NULL,
+    address TEXT NOT NULL,
     password TEXT NOT NULL
 );
 
@@ -13,5 +16,5 @@ CREATE TABLE `Accounts` (
     `balance` REAL NOT NULL
 );
 
-INSERT INTO Users (username, password) VALUES ('admin', 'test');
+INSERT INTO Users (username, password, firstname, lastname, address) VALUES ('admin', 'test', 'cameron', 'test', '123 test');
 INSERT INTO Accounts (users_userid, balance) VALUES (1, 10.99);

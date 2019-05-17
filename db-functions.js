@@ -52,10 +52,12 @@ module.exports = {
         });
     },
 
-    createAccountQuery: function(query) {
+    createAccountQuery: function(query, params) {
         let db = new sqlite3.Database('bank.db');
 
-        db.run(query);
+        db.run(query, params, function(err) {
+            console.log(err);
+        });
 
         db.close();
     }

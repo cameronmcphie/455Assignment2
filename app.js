@@ -69,7 +69,7 @@ app.post('/createaccount', function(req, res) {
     "use strict";
     // TODO: Sanatize inputs
     async function a() {
-        let accountCreationFulfilled = await ac.processAccount(req.body.username, req.body.password, req.body.confirmpassword);
+        let accountCreationFulfilled = await ac.processAccount(req, res);
 
         if (accountCreationFulfilled === false) {
             res.redirect('/createaccount');
@@ -103,11 +103,16 @@ app.post('/login', function (req, res) {
 
 });
 
-app.post('/createaccount', function(req, res) {
+app.post('/createbankaccount', async function(req, res) {
     "use strict";
 
     if(req.session.username) {
-        // TODO: Create account code
+        let getUserIdQuery = 'select userid from Users where username = ?';
+        let userResults = await dbfuns.getUser(getUserIdQuery, [req.session.username]);
+
+        let query = 'insert into Accounts (users_userid, balance) values (?,0)';
+        await dbfuns.performTransaction(query, [userResults.userid]);
+        res.redirect('/account');
     }
     else {
         req.session.reset();

@@ -19,9 +19,6 @@ module.exports = {
             let transactionType = req.body.transaction.action[0];
             let accountId = req.body.transaction.accountid[0];
             let amount = parseFloat(req.body.transaction.amount[0]);
-            
-            
-            console.log(req.body.transaction);
 
             let balancequery = 'select balance from Accounts where accountid = ?';
             let balanceResult = await dbfuns.getBalance(balancequery, [accountId]);
@@ -60,12 +57,12 @@ module.exports = {
                     // TODO: Ensure tranfer account belongs to user
 
                     let transferAccountId = req.body.transaction.transferto[0];
-                    console.log(transferAccountId);
+                    
 
                     // Get transfer to account balance
                     let transferToBalance = await dbfuns.getBalance(balancequery, [transferAccountId]);
                     transferToBalance = transferToBalance.balance;
-                    console.log('1:'+ transferToBalance);
+                    
 
                     // Create new balances for each
                     let newTranferredToBalance = parseFloat(transferToBalance + amount);

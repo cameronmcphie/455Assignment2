@@ -1,15 +1,22 @@
 const dbfuns = require('./db-functions.js');
 
 module.exports = {
-    processAccount: async function(username, password, confirmpassword) {
+    processAccount: async function(req) {
         "use strict";
+        let username = req.body.username;
+        let password = req.body.password;
+        let confirmpassword = req.body.confirmpassword;
+        let firstname = req.body.firstname;
+        let lasname = req.body.lastname;
+        let address = req.body.address;
+
         if(await checkIfUsernameExists(username) === true) {
             return false;
         }
         if(checkConfirmedPassword(password, confirmpassword) === false) {
             return false;
         }
-        createAccount(username, password);
+        createAccount(username, password, firstname, lasname, address);
         return true;
     }
 };
@@ -35,7 +42,10 @@ function checkConfirmedPassword(password, confirmpassword) {
     }
 };
 
-function createAccount(username, password) {
+function createAccount(username, password, firstname, lasname, address) {
     "use strict";
-    dbfuns.createAccountQuery("insert into Users (username, password) values ('" + username +"', '" + password + "');");
+    let query = "INSERT INTO Users (username, password, firstname, lastname, address) VALUES (?, ?, ?, ?, ?)";
+    let params = [username, password, firstname, lasname, address];
+
+    dbfuns.createAccountQuery(query, params);
 }
